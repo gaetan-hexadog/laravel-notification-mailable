@@ -7,6 +7,7 @@ use App\Mails\InvoiceMail;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\AnonymousNotifiable;
 
 class InvoiceMailable extends Notification implements ShouldQueue
 {
@@ -31,8 +32,13 @@ class InvoiceMailable extends Notification implements ShouldQueue
      */
     public function toMail($notifiable): Mailable
     {
+        $recipient = $notifiable instanceof AnonymousNotifiable
+             ? $notifiable->routeNotificationFor('mail')
+             : $notifiable->email;
+
         // TODO: customize based on order status
-        return (new InvoiceMail());
+        return (new InvoiceMail())
+            ->to($recipient);
     }
 
     /**
